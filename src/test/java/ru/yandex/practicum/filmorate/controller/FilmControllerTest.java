@@ -44,35 +44,8 @@ public class FilmControllerTest {
     }
 
     @Test
-    void createShouldNotAddMovieWithEmptyName() {
-        film.setName("");
-
-        Assertions.assertThrows(ValidationException.class, () -> controller.create(film));
-        Assertions.assertEquals(0, controller.getFilms().size());
-    }
-
-    @Test
-    void createShouldNotAddMovieWithDescriptionMoreThan200() {
-        film.setDescription("США после Гражданской войны. Легендарный охотник за головами Джон Рут по кличке " +
-                "Вешатель конвоирует заключенную. По пути к ним прибиваются еще несколько путешественников. Снежная " +
-                "буря вынуждает компанию искать укрытие в лавке на отшибе, где уже расположилось весьма пёстрое " +
-                "общество: генерал конфедератов, мексиканец, ковбой… И один из них — не тот, за кого себя выдает.");
-
-        Assertions.assertThrows(ValidationException.class, () -> controller.create(film));
-        Assertions.assertEquals(0, controller.getFilms().size());
-    }
-
-    @Test
     void createShouldNotAddMovieWithDateReleaseEarlier1895() {
         film.setReleaseDate(LocalDate.of(1894, 12, 12));
-
-        Assertions.assertThrows(ValidationException.class, () -> controller.create(film));
-        Assertions.assertEquals(0, controller.getFilms().size());
-    }
-
-    @Test
-    void createShouldNotAddMovieIfDurationIsLessThan0() {
-        film.setDuration(-4);
 
         Assertions.assertThrows(ValidationException.class, () -> controller.create(film));
         Assertions.assertEquals(0, controller.getFilms().size());

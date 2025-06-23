@@ -20,7 +20,9 @@ public class FilmController {
     @ResponseBody
     @PostMapping("/films")
     public Film create(@Valid @RequestBody Film film) {
-        filmValidation(film);
+        validateFilm(film);
+        film.setId(++id);
+        log.info("Идентификатор фильма: '{}", film.getId());
         films.put(film.getId(), film);
         log.info("Фильм '{}' добавлен в коллекцию сервиса, идентификатор: '{}'", film.getName(), film.getId());
         return film;
@@ -36,8 +38,8 @@ public class FilmController {
     @ResponseBody
     @PutMapping("/films")
     public Film update(@Valid @RequestBody Film film) {
-        filmValidation(film);
         if (films.containsKey(film.getId())) {
+            validateFilm(film);
             films.put(film.getId(), film);
             log.info("Фильм '{}' обновлён в коллекции сервиса, идентификатор: '{}'", film.getName(), film.getId());
         } else {
@@ -46,23 +48,9 @@ public class FilmController {
         return film;
     }
 
-    private void filmValidation(Film film) {
-        if (film.getReleaseDate() == null ||
-                film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+    private void validateFilm(Film film) {
+        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ValidationException("Ошибка! Некорректная дата выхода фильма");
-        }
-        if (film.getName().isEmpty() || film.getName().isBlank()) {
-            throw new ValidationException("Ошибка! Попытка зарегистрировать фильм без названия");
-        }
-        if (film.getDuration() <= 0) {
-            throw new ValidationException("Ошибка! Продолжительность фильма (мин) не может быть <= 0");
-        }
-        if (film.getDescription().length() > 200 || film.getDescription().isEmpty()) {
-            throw new ValidationException("Ошибка! Описание не может быть пустым или содержать более 200 символов");
-        }
-        if (film.getId() <= 0) {
-            film.setId(++id);
-            log.info("Идентификатор фильма: '{}", film.getId());
         }
     }
 }

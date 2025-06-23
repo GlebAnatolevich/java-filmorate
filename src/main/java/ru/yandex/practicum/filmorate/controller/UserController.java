@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +20,9 @@ public class UserController {
     @ResponseBody
     @PostMapping
     public User create(@Valid @RequestBody User user) {
-        userValidation(user);
+        validateUser(user);
+        user.setId(++id);
+        log.info("Идентификатор пользователя: '{}'", user.getId());
         users.put(user.getId(), user);
         log.info("Пользователь '{}' успешно создан с идентификатором '{}'", user.getEmail(), user.getId());
         return user;
@@ -37,7 +38,7 @@ public class UserController {
     @ResponseBody
     @PutMapping
     public User update(@Valid @RequestBody User user) {
-        userValidation(user);
+        validateUser(user);
         if (users.containsKey(user.getId())) {
             users.put(user.getId(), user);
             log.info("Данные пользователя '{}' с идентификатором '{}' успешно обновлены",
@@ -48,25 +49,10 @@ public class UserController {
         return user;
     }
 
-    private void userValidation(User user) {
-        if (user.getBirthday().isAfter(LocalDate.now()) || user.getBirthday() == null) {
-            throw new ValidationException("Некорректная дата рождения пользователя с идентификатором '"
-                    + user.getId() + "'");
-        }
-        if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-            throw new ValidationException("Некорректный адрес электронной почты пользователя с идентификатором '"
-                    + user.getId() + "'");
-        }
+    private void validateUser(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
             log.info("Имя пользователя с идентификатором '{}' установлено: '{}'", user.getId(), user.getName());
-        }
-        if (user.getId() == 0 || user.getId() < 0) {
-            user.setId(++id);
-            log.info("Идентификатор пользователя: '{}'", user.getId());
-        }
-        if (user.getLogin().isBlank() || user.getLogin().isEmpty()) {
-            throw new ValidationException("Некорректный логин пользователя с идентификатором '" + user.getId() + "'");
         }
     }
 }
