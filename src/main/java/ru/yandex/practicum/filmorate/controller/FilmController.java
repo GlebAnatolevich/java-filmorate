@@ -1,56 +1,56 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-@Slf4j
 @RestController
+@RequestMapping("/films")
+@RequiredArgsConstructor
 public class FilmController {
-    private final HashMap<Integer, Film> films = new HashMap<>();
-    private int id = 0;
+    @Autowired
+    private final FilmStorage filmStorage;
+    @Autowired
+    private final FilmService filmService;
 
-    @ResponseBody
-    @PostMapping("/films")
-    public Film create(@Valid @RequestBody Film film) {
-        validateFilm(film);
-        film.setId(++id);
-        log.info("Идентификатор фильма: '{}", film.getId());
-        films.put(film.getId(), film);
-        log.info("Фильм '{}' добавлен в коллекцию сервиса, идентификатор: '{}'", film.getName(), film.getId());
-        return film;
+    @PostMapping
+    public Film createFilm(@Valid @RequestBody Film film) {
+        return filmStorage.createFilm(film);
     }
 
-    @ResponseBody
-    @GetMapping("/films")
+    @GetMapping
     public List<Film> getFilms() {
-        log.info("В данный момент в коллекции сервиса '{}' фильмов", films.size());
-        return new ArrayList<>(films.values());
+        return filmStorage.getFilms();
     }
 
-    @ResponseBody
-    @PutMapping("/films")
-    public Film update(@Valid @RequestBody Film film) {
-        if (films.containsKey(film.getId())) {
-            validateFilm(film);
-            films.put(film.getId(), film);
-            log.info("Фильм '{}' обновлён в коллекции сервиса, идентификатор: '{}'", film.getName(), film.getId());
-        } else {
-            throw new ValidationException("Ошибка! Попытка обновления данных незарегистрированного фильма");
-        }
-        return film;
+    @PutMapping
+    public Film updateFilm(@Valid @RequestBody Film film) {
+        return filmStorage.updateFilm(film);
     }
 
-    private void validateFilm(Film film) {
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            throw new ValidationException("Ошибка! Некорректная дата выхода фильма");
-        }
+    @GetMapping("/{id}")
+    public Film getFilmById(@PathVariable Long id) {
+        return filmStorage.getFilmById(id);
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getPopularMovies(@RequestParam(defaultValue = "10") Integer count) {
+        return filmService.getPopularMovies(count);
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    public void likeAMovie(@PathVariable Long id, @PathVariable Long userId) {
+        filmService.like(id, userId);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public void removeLike(@PathVariable Long id, @PathVariable Long userId) {
+        filmService.dislike(id, userId);
     }
 }

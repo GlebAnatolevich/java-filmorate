@@ -6,13 +6,14 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
 @Builder
 public class User {
     @PositiveOrZero
-    private int id;
+    private Long id;
     @NotBlank
     @Email
     private String email;
@@ -22,4 +23,18 @@ public class User {
     @NotNull
     @PastOrPresent
     private LocalDate birthday;
+
+    private Set<Long> friends;
+
+    public void addFriend(Long id) {
+        friends.add(id);
+    }
+
+    public void removeFriend(Long id) {
+        friends.remove(id);
+    }
+
+    public int getFriendsQuantity() {
+        return friends.size();
+    }
 }
