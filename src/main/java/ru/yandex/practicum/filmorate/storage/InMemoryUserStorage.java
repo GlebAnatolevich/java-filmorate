@@ -67,5 +67,8 @@ public class InMemoryUserStorage implements UserStorage {
             user.setName(user.getLogin());
             log.info("Имя пользователя с идентификатором '{}' установлено: '{}'", user.getId(), user.getName());
         }
+        if (user.getFriends() == null) {
+            user.setFriends(new HashSet<>());
+        }
     }
 }
