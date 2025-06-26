@@ -39,9 +39,6 @@ public class UserService {
     public List<User> getFriends(Long userId) {
         User user = userStorage.getUserById(userId);
         Set<Long> friends = user.getFriends();
-        if (friends.isEmpty()) {
-            throw new ObjectNotFoundException("Список друзей пользователя с идентификатором " + userId + " пуст");
-        }
         return friends.stream()
                 .map(userStorage::getUserById)
                 .collect(Collectors.toList());
