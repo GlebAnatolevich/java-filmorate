@@ -49,8 +49,8 @@ public class UserService {
     }
 
     public void addFriend(Long userId, Long friendId) {
-        User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
+        User user = getUserById(userId);
+        User friend = getUserById(friendId);
         user.addFriend(friendId);
         friend.addFriend(userId);
         log.info("Пользователи с идентификаторами '{}' и '{}' добавили друг друга в друзья",
@@ -58,8 +58,8 @@ public class UserService {
     }
 
     public void deleteFriend(Long userId, Long friendId) {
-        User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
+        User user = getUserById(userId);
+        User friend = getUserById(friendId);
         user.removeFriend(friendId);
         friend.removeFriend(userId);
         log.info("Пользователи с идентификаторами '{}' и '{}' удалили друг друга из друзей",
@@ -67,7 +67,7 @@ public class UserService {
     }
 
     public List<User> getFriends(Long userId) {
-        User user = userStorage.getUserById(userId);
+        User user = getUserById(userId);
         Set<Long> friends = user.getFriends();
         return friends.stream()
                 .map(userStorage::getUserById)
@@ -75,8 +75,8 @@ public class UserService {
     }
 
     public List<User> getCommonFriends(Long userId, Long friendId) {
-        User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
+        User user = getUserById(userId);
+        User friend = getUserById(friendId);
         Set<Long> userFriends = user.getFriends();
         Set<Long> friendFriends = friend.getFriends();
         log.info("Список общих друзей пользователей с идентификаторами '{}' и '{}''", userId, friendId);

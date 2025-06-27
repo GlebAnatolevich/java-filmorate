@@ -53,7 +53,7 @@ public class FilmService {
     }
 
     public void like(Long filmId, Long userId) {
-        Film film = filmStorage.getFilmById(filmId);
+        Film film = getFilmById(filmId);
         userStorage.getUserById(userId);
         if (film == null) {
             throw new ObjectNotFoundException("Ошибка! Фильм отсутствует в коллекции сервиса");
