@@ -54,19 +54,25 @@ public class FilmService {
 
     public void like(Long filmId, Long userId) {
         Film film = getFilmById(filmId);
-        userStorage.getUserById(userId);
         if (film == null) {
             throw new ObjectNotFoundException("Ошибка! Фильм отсутствует в коллекции сервиса");
+        }
+        if (userStorage.getUserById(userId) == null) {
+            throw new ObjectNotFoundException("Ошибка! Пользователь с идентификатором " + userId + " отсутствует в " +
+                    "хранилище");
         }
         film.addLike(userId);
         log.info("Пользователь с идентификатором '{}' поставил лайк фильму с идентификатором '{}'", userId, filmId);
     }
 
     public void dislike(Long filmId, Long userId) {
-        Film film = filmStorage.getFilmById(filmId);
-        userStorage.getUserById(userId);
+        Film film = getFilmById(filmId);
         if (film == null) {
             throw new ObjectNotFoundException("Ошибка! Фильм отсутствует в коллекции сервиса");
+        }
+        if (userStorage.getUserById(userId) == null) {
+            throw new ObjectNotFoundException("Ошибка! Пользователь с идентификатором " + userId + " отсутствует в " +
+                    "хранилище");
         }
         film.removeLike(userId);
         log.info("Пользователь с идентификатором '{}' убрал лайк фильму с идентификатором '{}'", userId, filmId);
