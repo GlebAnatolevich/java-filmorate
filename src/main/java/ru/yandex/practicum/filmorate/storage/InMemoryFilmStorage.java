@@ -2,27 +2,19 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @Slf4j
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
-    private final Map<Long, Film> films;
-    private Long id;
-
-    public InMemoryFilmStorage() {
-        films = new HashMap<>();
-        id = 0L;
-    }
+    private final Map<Long, Film> films = new HashMap<>();
+    private Long id = 0L;
 
     @Override
     public Film createFilm(Film film) {
-        validateFilm(film);
         film.setId(++id);
         log.info("Идентификатор фильма: '{}", film.getId());
         films.put(film.getId(), film);
@@ -32,14 +24,9 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) {
-        if (films.containsKey(film.getId())) {
-            validateFilm(film);
             films.put(film.getId(), film);
             log.info("Фильм '{}' обновлён в коллекции сервиса, идентификатор: '{}'", film.getName(), film.getId());
             return film;
-        } else {
-            throw new ObjectNotFoundException("Ошибка! Попытка обновления данных незарегистрированного фильма");
-        }
     }
 
     @Override
@@ -50,9 +37,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film getFilmById(Long id) {
-        if (!films.containsKey(id)) {
-            throw new ObjectNotFoundException("Ошибка! Фильм с идентификатором " + id + " отсутствует в коллекции");
-        }
         return films.get(id);
     }
 
@@ -62,12 +46,8 @@ public class InMemoryFilmStorage implements FilmStorage {
         return new ArrayList<>(films.values());
     }
 
-    private void validateFilm(Film film) {
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            throw new ValidationException("Ошибка! Некорректная дата выхода фильма");
-        }
-        if (film.getLikes() == null) {
-            film.setLikes(new HashSet<>());
-        }
+    @Override
+    public Boolean existById(Long id) {
+        return films.containsKey(id);
     }
 }

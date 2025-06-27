@@ -15,7 +15,7 @@ import java.util.List;
 public class UserControllerTest {
     private final InMemoryUserStorage storage = new InMemoryUserStorage();
     private final UserService service = new UserService(storage);
-    private final UserController controller = new UserController(storage, service);
+    private final UserController controller = new UserController(service);
     private final User user = User.builder()
             .id(1L)
             .email("gg@yandex.ru")

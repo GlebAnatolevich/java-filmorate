@@ -4,10 +4,12 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class Film {
     @PositiveOrZero
@@ -21,7 +23,7 @@ public class Film {
     private LocalDate releaseDate;
     @Positive
     private long duration;
-    private Set<Long> likes;
+    private Set<Long> likes = new HashSet<>();
 
     public void addLike(Long userId) {
         likes.add(userId);

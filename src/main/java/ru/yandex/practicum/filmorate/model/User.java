@@ -4,12 +4,15 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class User {
     @PositiveOrZero
@@ -23,8 +26,7 @@ public class User {
     @NotNull
     @PastOrPresent
     private LocalDate birthday;
-
-    private Set<Long> friends;
+    private Set<Long> friends = new HashSet<>();
 
     public void addFriend(Long id) {
         friends.add(id);

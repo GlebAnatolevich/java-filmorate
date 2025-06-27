@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
@@ -21,9 +20,8 @@ import java.util.List;
 public class FilmControllerTest {
     private final FilmStorage storage = new InMemoryFilmStorage();
     private final UserStorage userStorage = new InMemoryUserStorage();
-    private final UserService userService = new UserService(userStorage);
-    private final FilmService service = new FilmService(storage, userService);
-    private final FilmController controller = new FilmController(storage, service);
+    private final FilmService service = new FilmService(storage, userStorage);
+    private final FilmController controller = new FilmController(service);
     private final Film film = Film.builder()
             .id(1L)
             .name("Омерзительная восьмёрка")
