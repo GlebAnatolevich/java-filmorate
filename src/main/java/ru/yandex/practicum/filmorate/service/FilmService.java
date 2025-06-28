@@ -85,7 +85,7 @@ public class FilmService {
                 .limit(count).collect(Collectors.toList());
     }
 
-    public void validateFilm(Film film) {
+    private void validateFilm(Film film) {
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ValidationException("Ошибка! Некорректная дата выхода фильма");
         }
