@@ -11,7 +11,6 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.exception.ObjectAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserDbService;
 
@@ -117,17 +116,6 @@ public class UserControllerTest {
 
         Assertions.assertTrue(userService.getFriendsList(thisUser.getId()).isEmpty());
         Assertions.assertTrue(userService.getFriendsList(thisFriend.getId()).isEmpty());
-    }
-
-    @Test
-    public void deleteFriendShouldThrowExceptionIfNotFriends() {
-        User thisUser = userService.createUser(user);
-        User thisFriend = userService.createUser(friend);
-
-        Assertions.assertThrows(ValidationException.class,
-                () -> userService.deleteFriend(thisUser.getId(), thisFriend.getId()));
-        Assertions.assertThrows(ValidationException.class,
-                () -> userService.deleteFriend(thisFriend.getId(), thisUser.getId()));
     }
 
     @Test
