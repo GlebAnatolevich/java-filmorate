@@ -68,7 +68,7 @@ public class UserDbService {
     }
 
     public void deleteFriend(Long userId, Long friendId) {
-        cheIfNotFriend(userId, friendId);
+        checkIfNotFriend(userId, friendId);
         friendshipDao.deleteFriend(userId, friendId);
     }
 
@@ -127,7 +127,7 @@ public class UserDbService {
         }
     }
 
-    private void cheIfNotFriend(Long userId, Long friendId) {
+    private void checkIfNotFriend(Long userId, Long friendId) {
         log.debug("checkIfNotFriend({}, {})", userId, friendId);
         if (!userStorage.isContains(userId)) {
             throw new ObjectNotFoundException(format("Пользователь с id %d не найден", userId));
@@ -138,10 +138,6 @@ public class UserDbService {
         if (userId.equals(friendId)) {
             throw new ObjectAlreadyExistsException(
                     "Ошибка! Попытка удалить себя из списка друзей, id " + userId);
-        }
-        if (!friendshipDao.isFriend(userId, friendId)) {
-            throw new ValidationException(
-                    format("Пользователи с id %d и %d не являются друзьями", userId, friendId));
         }
     }
 }
