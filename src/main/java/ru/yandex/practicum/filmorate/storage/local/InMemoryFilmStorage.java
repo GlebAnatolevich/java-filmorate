@@ -94,7 +94,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Set<Genre> getGenres(Long filmId) {
-        return null;
+        return films.get(filmId).getGenres();
     }
 
     @Override
