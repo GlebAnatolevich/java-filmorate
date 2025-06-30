@@ -84,18 +84,18 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public void addLike(Long filmId, Long userId) {
-
-    }
-
-    @Override
-    public void removeLike(Long filmId, Long userId) {
-
-    }
-
-    @Override
-    public int getLikesQuantity(Long filmId) {
-        return 0;
+    public List<Film> getPopularMovies(Integer count) {
+        log.debug("getPopularMovies({})", count);
+        List<Film> popularMovies = jdbcTemplate.query(
+                """
+                        SELECT f.film_id, f.name, f.description, f.release_date, f.duration, f.mpa_id\s
+                        FROM likes as l
+                        RIGHT OUTER JOIN films as f ON f.film_id=l.film_id
+                        GROUP BY f.film_id
+                        ORDER BY COUNT(l.user_id) DESC
+                        LIMIT ?""", new FilmMapper(), count);
+        log.trace("Самые популярные фильмы: {}", popularMovies);
+        return popularMovies;
     }
 
     @Override

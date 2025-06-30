@@ -71,18 +71,28 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public void addFriend(Long userId, Long friendId) {
-
+    public List<User> getFriendsByUserId(Long userId) {
+        return jdbcTemplate.query("""
+                SELECT user_id, email, login, name, birthday
+                FROM users
+                WHERE user_id IN (SELECT friend_id
+                FROM friends as f
+                WHERE user_id=?)
+                """, new UserMapper(), userId);
     }
 
     @Override
-    public void removeFriend(Long userId, Long friendId) {
-
-    }
-
-    @Override
-    public List<User> getFriends(Long userId) {
-        return null;
+    public List<User> getCommonFriends(Long userId, Long friendId) {
+        return jdbcTemplate.query("""
+                SELECT user_id, email, login, name, birthday
+                FROM users
+                WHERE user_id IN (SELECT friend_id
+                FROM friends
+                WHERE user_id=? AND friend_id IN
+                (SELECT friend_id
+                FROM friends
+                WHERE user_id=?))
+                """, new UserMapper(), userId, friendId);
     }
 
     @Override

@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.storage.db.user.UserDbStorage;
 import ru.yandex.practicum.filmorate.storage.db.user.UserStorage;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -76,10 +75,7 @@ public class UserDbService {
         if (!userStorage.isContains(id)) {
             throw new ObjectNotFoundException(format("Пользователь с id %d не найден", id));
         }
-        List<User> friends = friendshipDao.getFriends(id).stream()
-                .mapToLong(Long::valueOf)
-                .mapToObj(userStorage::getUserById)
-                .collect(Collectors.toList());
+        List<User> friends = userStorage.getFriendsByUserId(id);
         log.trace("Друзья пользователя: {}", friends);
         return friends;
     }
@@ -94,12 +90,7 @@ public class UserDbService {
         if (userId.equals(friendId)) {
             throw new ObjectAlreadyExistsException("Невозможно посмотреть список общих друзей, id " + userId);
         }
-        List<User> userFriends = getFriendsList(userId);
-        List<User> friendFriends = getFriendsList(friendId);
-        return friendFriends.stream()
-                .filter(userFriends::contains)
-                .filter(friendFriends::contains)
-                .collect(Collectors.toList());
+        return userStorage.getCommonFriends(userId, friendId);
     }
 
     private void validate(User user) {

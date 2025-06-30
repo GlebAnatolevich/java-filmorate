@@ -20,7 +20,6 @@ import ru.yandex.practicum.filmorate.storage.db.user.UserStorage;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -85,14 +84,12 @@ public class FilmDbService {
         return films;
     }
 
-    public Collection<Film> getPopularMovies(Integer count) {
-        log.debug("getPopularMovies({})", count);
-        List<Film> popularMovies = getFilms()
-                .stream()
-                .sorted(this::compare)
-                .limit(count)
-                .collect(Collectors.toList());
-        log.trace("Самые популярные фильмы: {}", popularMovies);
+    public List<Film> getPopularMovies(Integer count) {
+        List<Film> popularMovies = filmStorage.getPopularMovies(count);
+        for (Film film : popularMovies) {
+            film.setGenres(filmStorage.getGenres(film.getId()));
+            film.setMpa(mpaDao.getMpaById(film.getMpa().getId()));
+        }
         return popularMovies;
     }
 
@@ -153,10 +150,6 @@ public class FilmDbService {
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ValidationException("Ошибка! Некорректная дата выхода фильма");
         }
-    }
-
-    private int compare(Film film, Film otherFilm) {
-        return Integer.compare(likeDao.countLikes(otherFilm.getId()), likeDao.countLikes(film.getId()));
     }
 
     private void checkLike(Long filmId, Long userId) {
