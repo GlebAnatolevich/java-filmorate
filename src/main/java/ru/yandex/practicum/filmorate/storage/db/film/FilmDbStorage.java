@@ -1,19 +1,22 @@
 package ru.yandex.practicum.filmorate.storage.db.film;
 
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.storage.mapper.GenreMapper;
-
-import java.sql.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @Component("FilmDbStorage")
@@ -23,24 +26,26 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film createFilm(Film film) {
-        log.debug("createFilm({})", film);
-        jdbcTemplate.update(
-                "INSERT INTO films (name, description, release_date, duration, mpa_id) VALUES (?, ?, ?, ?, ?)",
-                film.getName(),
-                film.getDescription(),
-                Date.valueOf(film.getReleaseDate()),
-                film.getDuration(),
-                film.getMpa().getId());
-        Film thisFilm = jdbcTemplate.queryForObject(
-                "SELECT film_id, name, description, release_date, duration, mpa_id FROM films WHERE name=? "
-                        + "AND description=? AND release_date=? AND duration=? AND mpa_id=?",
-                new FilmMapper(), film.getName(),
-                film.getDescription(),
-                Date.valueOf(film.getReleaseDate()),
-                film.getDuration(),
-                film.getMpa().getId());
-        log.trace("Фильм {} был добавлен в базу данных", thisFilm);
-        return thisFilm;
+        KeyHolder keyHolder;
+        keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO films (name, description, release_date, duration, mpa_id) " +
+                            "VALUES (?, ?, ?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS
+            );
+            ps.setString(1, film.getName());
+            ps.setString(2, film.getDescription());
+            ps.setDate(3, Date.valueOf(film.getReleaseDate()));
+            ps.setLong(4, film.getDuration());
+            ps.setInt(5, film.getMpa().getId());
+            return ps;
+        }, keyHolder);
+
+        long filmId = keyHolder.getKey().longValue();
+        film.setId(filmId);
+        return film;
     }
 
     @Override
