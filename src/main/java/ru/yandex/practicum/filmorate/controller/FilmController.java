@@ -4,15 +4,15 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.FilmDbService;
 
-import java.util.List;
+import java.util.Collection;
 
 @RestController
 @RequestMapping("/films")
 @RequiredArgsConstructor
 public class FilmController {
-    private final FilmService filmService;
+    private final FilmDbService filmService;
 
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
@@ -20,7 +20,7 @@ public class FilmController {
     }
 
     @GetMapping
-    public List<Film> getFilms() {
+    public Collection<Film> getFilms() {
         return filmService.getFilms();
     }
 
@@ -35,7 +35,7 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getPopularMovies(@RequestParam(defaultValue = "10") Integer count) {
+    public Collection<Film> getPopularMovies(@RequestParam(defaultValue = "10") Integer count) {
         return filmService.getPopularMovies(count);
     }
 
