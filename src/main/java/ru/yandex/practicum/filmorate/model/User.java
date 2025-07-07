@@ -7,8 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -26,17 +24,11 @@ public class User {
     @NotNull
     @PastOrPresent
     private LocalDate birthday;
-    private Set<Long> friends = new HashSet<>();
 
-    public void addFriend(Long id) {
-        friends.add(id);
-    }
-
-    public void removeFriend(Long id) {
-        friends.remove(id);
-    }
-
-    public int getFriendsQuantity() {
-        return friends.size();
+    public User(String email, String login, String name, LocalDate birthday) {
+        this.email = email;
+        this.login = login;
+        this.name = name;
+        this.birthday = birthday;
     }
 }
